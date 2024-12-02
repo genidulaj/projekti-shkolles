@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Manage Car Fleet</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  </head>
+  <body>
+    <div class="container-fluid">
+      <div class="row mt-5">
+        <!-- Add Car Section -->
+        <div class="col-md-6">
+          <h3>Add a Car</h3>
+          <form id="addCarForm">
+            <div class="mb-3">
+              <label for="carBrand" class="form-label">Car Brand</label>
+              <input type="text" class="form-control" id="carBrand" required>
+            </div>
+            <div class="mb-3">
+              <label for="carModel" class="form-label">Car Model</label>
+              <input type="text" class="form-control" id="carModel" required>
+            </div>
+            <div class="mb-3">
+              <label for="carType" class="form-label">Car Type</label>
+              <input type="text" class="form-control" id="carType" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Car</button>
+          </form>
+        </div>
+
+        <!-- Remove Car Section -->
+        <div class="col-md-6">
+          <h3>Remove a Car</h3>
+          <form id="removeCarForm">
+            <div class="mb-3">
+              <label for="removeCarModel" class="form-label">Car Model to Remove</label>
+              <input type="text" class="form-control" id="removeCarModel" required>
+            </div>
+            <button type="submit" class="btn btn-danger">Remove Car</button>
+          </form>
+        </div>
+      </div>
+
+      <hr>
+
+      <!-- Display List of Cars -->
+      <h4>Current Car Fleet:</h4>
+      <ul id="carList" class="list-group">
+        <!-- Cars will be listed here -->
+      </ul>
+    </div>
+
+    <script>
+      // Get car fleet from localStorage
+      function getCarFleet() {
+        return JSON.parse(localStorage.getItem('listings'));
+      }
+
+      // Display car fleet in the list
+      function displayCarFleet() {
+        const carList = document.getElementById('carList');
+        const cars = getCarFleet();
+        carList.innerHTML = ''; // Clear current list
+        cars.forEach((car, index) => {
+          const li = document.createElement('li');
+          li.classList.add('list-group-item');
+          li.textContent = `${car.carBrands} ${car.carModels} - ${car.type}`;
+          carList.appendChild(li);
+        });
+      }
+
+      // Add a car to the fleet
+      function addCar(car) {
+        const cars = getCarFleet();
+        cars.push(car);
+        localStorage.setItem('listings', JSON.stringify(cars)); // Store updated list in localStorage
+        displayCarFleet();
+      }
+
+      // Remove a car from the fleet by model
+      function removeCar(model) {
+        let cars = getCarFleet();
+        cars = cars.filter(car => car.carModels.toLowerCase() !== model.toLowerCase());
+        localStorage.setItem('listings', JSON.stringify(cars)); // Store updated list in localStorage
+        displayCarFleet();
+      }
+
+      // Event listener for adding a car
+      document.getElementById('addCarForm').addEventListener('submit', function (event) {
+        event.preventDefault();
+        const carBrand = document.getElementById('carBrand').value.trim();
+        const carModel = document.getElementById('carModel').value.trim();
+        const carType = document.getElementById('carType').value.trim();
+
+        if (carBrand && carModel && carType) {
+          const newCar = { carBrand, carModel, carType };
+          addCar(newCar);
+        }
+      });
+
+      // Event listener for removing a car
+      document.getElementById('removeCarForm').addEventListener('submit', function (event) {
+        event.preventDefault();
+        const carModelToRemove = document.getElementById('removeCarModel').value.trim();
+
+        if (carModelToRemove) {
+          removeCar(carModelToRemove);
+        }
+      });
+
+      // Populate the car list on initial load
+      displayCarFleet();
+    </script>
+  </body>
+</html>
